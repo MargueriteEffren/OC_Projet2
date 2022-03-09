@@ -8,4 +8,4 @@ Put file called "projet2g.py" in a Folder
 with your terminal, navigate to this folder  
 Once in the Folder, input in your terminal: python3 projet2g.py  
 Check the various csv output files in your folder  
-Note: the program run time exceed 20 minutes  
+Note: the program run time exceeds 20 minutes  
