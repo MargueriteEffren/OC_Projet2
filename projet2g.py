@@ -6,7 +6,7 @@ import re
 
 # page to scrape's url:
 url_site = "http://books.toscrape.com"
-def Get_categories_urls(url_site):
+def get_categories_urls(url_site):
 	reponse = requests.get(url_site)
 	page = reponse.content
 
@@ -22,39 +22,39 @@ def Get_categories_urls(url_site):
 		list_href_category.append('http://books.toscrape.com/'+href_url_category)
 	return(list_href_category)
 
-list_href_category_to_use = Get_categories_urls(url_site)
+list_href_category_to_use = get_categories_urls(url_site)
 #récupération des liens des livres d'une category d'une page (remarque: la variable url2 est l'url extrait d'une liste des urls des category du site- voir en bas du code) :
 
 
-def File_creation_by_category(url2):
+def file_creation_by_category(url_category):
 	#function: get category name from URL:
 
-	def category_name(url2):
+	def category_name(url_category):
 		
-		split_url = url2.split('/')
+		split_url = url_category.split('/')
 		catgory_name = split_url[6]
 		return catgory_name
 
 
-	def browse_category_all_pages(url2):
+	def category_all_pages_list(url_category):
 	#récupération des liens de toutes les pages d'une catégorie:
 
 
-		reponse3 = requests.get(url2)
+		reponse3 = requests.get(url_category)
 
 		list_urls_per_category=[]
 
-		list_urls_per_category.append(url2)
+		list_urls_per_category.append(url_category)
 
 		listindex = [1,2,3,4,5,6,7,8]
 		i=1
 
 		while i in listindex:
 			i+=1
-			url3 = url2.replace('index',"page-"+str(i))
-			reponse4 = requests.get(url3)
+			url_next = url_category.replace('index',"page-"+str(i))
+			reponse4 = requests.get(url_next)
 			if reponse4.ok:
-				list_urls_per_category.append(url3)
+				list_urls_per_category.append(url_next)
 
 		return(list_urls_per_category)
 
@@ -62,12 +62,10 @@ def File_creation_by_category(url2):
 	books_details_urls = []
 
 	#je crée une fonction pour récupérer les livres d'une page html category:
-	def get_all_books_from_category(j):
+	def get_all_books_from_category(url_category):
 		#lien de la page category
-		url = j
-
-
-		reponse2 = requests.get(url)
+		
+		reponse2 = requests.get(url_category)
 		page2 = reponse2.content
 
 
@@ -77,26 +75,26 @@ def File_creation_by_category(url2):
 
 		books_urls = soup.find_all("h3")
 		for h3 in books_urls:
-			a = h3.find('a')
-			book_url = a['href']
+			a_tag = h3.find('a')
+			book_url = a_tag['href']
 
 		# je remets l'adresse url au complet:
-			book_url2 = book_url.replace('../../../',"")
+			clean_book_url = book_url.replace('../../../',"")
 
 		#tout en ajoutant à la liste finale:
-			books_details_urls.append('http://books.toscrape.com/catalogue/'+book_url2)
+			books_details_urls.append('http://books.toscrape.com/catalogue/'+clean_book_url)
 		
 
 
-	#remplissage de [books_details_urls] avec les url de tous les livres d'une même catégorie, même s'il y a plusieurs pages pour cette catégorie:
-	list_urls_per_category = browse_category_all_pages(url2)
-	n=0
-	j=list_urls_per_category[0]
-	get_all_books_from_category(j)
-	while n < (len(list_urls_per_category)-1):
-		n+=1
-		j=list_urls_per_category[n]
-		get_all_books_from_category(j)
+	#remplissage de [books_details_urls] avec les urls de tous les livres d'une même catégorie, même s'il y a plusieurs pages pour cette catégorie:
+	list_urls_per_category = category_all_pages_list(url_category)
+	i=0
+	url=list_urls_per_category[0]
+	get_all_books_from_category(url)
+	while i < (len(list_urls_per_category)-1):
+		i+=1
+		url=list_urls_per_category[i]
+		get_all_books_from_category(url)
 
 
 	#récupération des détails des livres d'une page de category et transfert dans un fichier csv :
@@ -119,8 +117,7 @@ def File_creation_by_category(url2):
 
 
 	#get book details:
-	def single_book_details(x):
-		url = x
+	def single_book_details(url):
 		reponse = requests.get(url)
 		page = reponse.content
 
@@ -196,20 +193,19 @@ def File_creation_by_category(url2):
 
 	# création du fichier data.csv
 	en_tete = ['product_data', 'content']
-	with open(category_name(url2)+'.csv', 'w',encoding='utf-8') as fichier_csv:
+	with open(category_name(url_category)+'.csv', 'w',encoding='utf-8') as fichier_csv:
 		writer = csv.writer(fichier_csv, delimiter=',')
 		writer.writerow(columns)
 	#je demande au fichier d'ecrire les detail de chaque livre pour tous les livres présents dans books_details_urls
-		for y in books_details_urls:
-			single_book_details(y)
-			writer.writerow(single_book_details(y))
+		for url in books_details_urls:
+			single_book_details(url)
+			writer.writerow(single_book_details(url))
 
-index_url2 = 0
-url2 = list_href_category_to_use[index_url2]
-File_creation_by_category(url2)
-	
-while index_url2 in range(0,49):
+
+for index_url2 in range(-1,49):
 	index_url2+=1
-	url2 = list_href_category_to_use[index_url2]
-	File_creation_by_category(url2)
+	url_category = list_href_category_to_use[index_url2]
+	file_creation_by_category(url_category)
+
+
 	
