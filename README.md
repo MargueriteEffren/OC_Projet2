@@ -18,10 +18,10 @@ $ pip install -r requirements.txt
 
 
 With your terminal, navigate to your folder env;
-Once in the folder, input in your terminal: python3 projet2g.py  
-Check the various csv output files in your folder  
-Note: the program run time exceeds 20 minutes  
+Once in the folder, input in your terminal: python3 projet2g.py;  
+Check the various csv output files in your folder; 
+Note: the program run time exceeds 20 minutes;  
 
-also to get the images:
-in put in your terminal: python3 projet2image.py
+also to get the images: 
+input in your terminal: python3 projet2image.py; 
 answer the question by copy/pasting url from a category from https://books.toscrape.com/
